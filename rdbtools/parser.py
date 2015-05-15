@@ -263,6 +263,11 @@ class RdbParser :
         self._key = None
         self._expiry = None
         self.init_filter(filters)
+        try:
+            import lzf
+            self.lzf_decompress = lzf.decompress
+        except ImportError:
+            self.lzf_decompress = self._lzf_decompress
 
     def parse(self, filename):
         """
@@ -652,7 +657,7 @@ class RdbParser :
     def get_logical_type(self, data_type):
         return DATA_TYPE_MAPPING[data_type]
         
-    def lzf_decompress(self, compressed, expected_length):
+    def _lzf_decompress(self, compressed, expected_length):
         in_stream = bytearray(compressed)
         in_len = len(in_stream)
         in_index = 0
