@@ -385,6 +385,11 @@ class RdbParser(object):
         self._freq = None
         self.init_filter(filters)
         self._rdb_version = 0
+        try:
+            import lzf
+            self.lzf_decompress = lzf.decompress
+        except ImportError:
+            self.lzf_decompress = self._lzf_decompress
 
     def parse(self, filename):
         """
@@ -1016,7 +1021,7 @@ class RdbParser(object):
     def get_logical_type(self, data_type):
         return DATA_TYPE_MAPPING[data_type]
         
-    def lzf_decompress(self, compressed, expected_length):
+    def _lzf_decompress(self, compressed, expected_length):
         if HAS_PYTHON_LZF:
             return lzf.decompress(compressed, expected_length)
         else:
